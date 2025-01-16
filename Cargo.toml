@@ -1,0 +1,9 @@
+[package]
+name = "rust-file-sync"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rayon = "1.10"
+rusqlite = { version = "0.32.0", features = ["bundled"] }
+num_cpus = "1.15.0"
