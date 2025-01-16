@@ -1,7 +1,7 @@
 use rayon::prelude::*;
 use rusqlite::{params, Connection};
 use std::{
-    fs, io,
+    env, fs, io,
     path::Path,
     process::exit,
     sync::{Arc, Mutex},
@@ -68,8 +68,8 @@ fn sync_directory(source: &Path, destination: &Path, state: Arc<SyncState>) -> i
         let relative_path = path.strip_prefix(source).unwrap();
         let destination_path = destination.join(relative_path);
 
-        if state.is_completed(&relative_path) {
-            println!("Skipping already completed: {:?}", relative_path);
+        if state.is_completed(&path) {
+            println!("Skipping already completed: {:?}", path);
             return;
         }
         // Ensure the destination directory exists or create it
@@ -100,9 +100,9 @@ fn sync_directory(source: &Path, destination: &Path, state: Arc<SyncState>) -> i
             println!("Copying file: {:?} to {:?}", path, destination_path);
             if let Err(e) = fs::copy(&path, &destination_path) {
                 eprintln!("Failed to copy {:?}: {:?}", path, e);
-                state.mark_skipped(relative_path);
+                state.mark_skipped(&path);
             } else {
-                state.mark_completed(relative_path);
+                state.mark_completed(&path);
             }
         }
     });
@@ -111,16 +111,45 @@ fn sync_directory(source: &Path, destination: &Path, state: Arc<SyncState>) -> i
 }
 
 fn main() -> io::Result<()> {
-    let source_dir = Path::new("./test/source");
-    let destination_dir = Path::new("./test/tmp/destination");
-    let state_file = "sync_state.db";
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() != 3 {
+        eprintln!(
+            "Usage: {} <source_directory> <destination_directory>",
+            args[0]
+        );
+        exit(1);
+    }
+
+    let source_dir = Path::new(&args[1])
+        .canonicalize()
+        .expect("Failed to get absolute path");
+    let destination = Path::new(&args[2]);
+    if !destination.exists() {
+        println!(
+            "Destination directory {:?} does not exist. Creating it...",
+            destination
+        );
+        if let Err(e) = fs::create_dir_all(destination) {
+            eprintln!(
+                "Failed to create destination directory {:?}: {:?}",
+                destination, e
+            );
+            exit(1);
+        }
+    }
+    let destination_dir = destination
+        .canonicalize()
+        .expect("Failed to get absolute path");
+    let state_file = "sync_state-1.db";
 
     println!("Initializing synchronization state...");
     let state = Arc::new(SyncState::new(state_file));
 
     println!(
         "Starting synchronization from {:?} to {:?}...",
-        source_dir, destination_dir
+        source_dir.as_path(),
+        destination_dir
     );
 
     rayon::ThreadPoolBuilder::new()
@@ -128,7 +157,11 @@ fn main() -> io::Result<()> {
         .build_global()
         .expect("Failed to build thread pool");
 
-    sync_directory(source_dir, destination_dir, Arc::clone(&state))?;
+    sync_directory(
+        source_dir.as_path(),
+        destination_dir.as_path(),
+        Arc::clone(&state),
+    )?;
 
     println!("Synchronization completed.");
     Ok(())
