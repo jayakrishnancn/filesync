@@ -1,7 +1,15 @@
+use std::fmt;
+
 pub enum Strategy {
     TwoWay,
     MIRROR,
     UPDATE,
+}
+
+impl fmt::Display for Actions {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 #[derive(Clone, Debug, Default)]
