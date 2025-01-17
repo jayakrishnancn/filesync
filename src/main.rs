@@ -11,7 +11,6 @@
 // 9. schedule
 
 mod compare;
-mod dbops;
 mod enums;
 mod filter;
 mod sync;
@@ -30,6 +29,6 @@ fn main() {
     let items = filter::filter(items);
     let state = Arc::new(SyncState::new(&db_file_name));
     state.mark_multiple(&items, "compared");
-    sync::sync_files(items, &state);
+    sync::sync_files(source.as_path(), destination.as_path(), items, &state);
     state.check_if_all_are_comleted();
 }

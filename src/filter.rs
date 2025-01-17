@@ -25,7 +25,7 @@ pub fn filter(items: Vec<State>) -> Vec<State> {
     items
         .into_iter()
         .filter(filter_ds_store)
-        .filter(skip_directory)
-        // .filter(filter_skip_and_unknown_action)
+        // .filter(skip_directory)
+        .filter(filter_skip_and_unknown_action)
         .collect()
 }
