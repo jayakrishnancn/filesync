@@ -30,5 +30,9 @@ fn main() {
     let state = Arc::new(SyncState::new(&db_file_name));
     state.mark_multiple(&items, "compared");
     sync::sync_files(source.as_path(), destination.as_path(), items, &state);
-    state.check_if_all_are_comleted();
+    if state.check_if_all_are_comleted() {
+        println!("Successfully synced ♥");
+    } else {
+        println!("Some files are missing in destination");
+    }
 }

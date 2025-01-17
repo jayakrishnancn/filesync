@@ -1,9 +1,9 @@
 use std::fmt;
 
 pub enum Strategy {
-    TwoWay,
-    MIRROR,
-    UPDATE,
+    // TwoWay,
+    Mirror,
+    Update,
 }
 
 impl fmt::Display for Actions {
@@ -14,19 +14,19 @@ impl fmt::Display for Actions {
 
 #[derive(Clone, Debug, Default)]
 pub enum Actions {
-    CREATE,
-    UPDATE, // or replace
-    DELETE,
-    SKIP,
+    Create,
+    // UPDATE, // or replace
+    Delete,
+    Skip,
     #[default]
-    UNKNOWN,
+    Unknown,
 }
 
 #[derive(Clone, Debug, Default)]
 pub enum PathType {
-    LINK,
-    DIR,
-    FILE,
+    Link,
+    Dir,
+    File,
     #[default]
-    UNKNOWN,
+    Unknown,
 }

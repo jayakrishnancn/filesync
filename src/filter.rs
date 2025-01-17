@@ -14,12 +14,12 @@ pub fn filter_skip_and_unknown_action(item: &State) -> bool {
     }
 }
 
-pub fn skip_directory(item: &State) -> bool {
-    match item.path_type {
-        PathType::FILE => true,
-        _ => false,
-    }
-}
+// pub fn skip_directory(item: &State) -> bool {
+//     match item.path_type {
+//         PathType::FILE => true,
+//         _ => false,
+//     }
+// }
 
 pub fn filter(items: Vec<State>) -> Vec<State> {
     items
