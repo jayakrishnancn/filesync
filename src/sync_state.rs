@@ -26,20 +26,28 @@ impl SyncState {
         }
     }
 
-    pub fn mark_multiple(&self, items: Vec<State>) {
+    pub fn mark_multiple(&self, items: &Vec<State>, status: &str) {
         let mut conn = self.conn.lock().unwrap(); // Declare as mutable
-                                                  // Use a transaction for efficiency when inserting multiple rows
         let transaction = conn.transaction().expect("Failed to start transaction.");
-
         for state in items {
             transaction
                 .execute(
                     "INSERT OR REPLACE INTO sync_state (path, status, action, checksum) VALUES (?1, ?2, ?3, ?4)",
-                    params![state.path, "marked", state.action.to_string(), state.hash ],
+                    params![state.path, status, state.action.to_string(), state.hash ],
                 )
                 .expect("Failed to update sync state.");
         }
         transaction.commit().expect("Failed to commit transaction.");
         println!("marked all.")
+    }
+
+    pub fn check_if_all_are_comleted(&self) -> bool {
+        let conn = self.conn.lock().unwrap();
+        let query = "SELECT COUNT(*) FROM sync_state WHERE status != 'completed'";
+        let count: i64 = conn
+            .query_row(query, [], |row| row.get(0))
+            .unwrap_or_else(|_| -1); // Default to -1 on query failure
+
+        count == 0
     }
 }

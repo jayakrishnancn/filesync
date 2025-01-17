@@ -29,7 +29,7 @@ fn main() {
     let items = compare::compare(source.as_path(), destination.as_path(), strategy);
     let items = filter::filter(items);
     let state = Arc::new(SyncState::new(&db_file_name));
-    state.mark_multiple(items);
-    // sync::sync_files(source, destination, db_name, strategy);
-    // dbops::revalidate_and_update_db(db_name);
+    state.mark_multiple(&items, "compared");
+    sync::sync_files(items, &state);
+    state.check_if_all_are_comleted();
 }
