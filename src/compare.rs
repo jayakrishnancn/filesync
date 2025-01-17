@@ -32,18 +32,18 @@ pub fn compare(source: &Path, destination: &Path, strategy: Strategy) -> Vec<Sta
             if let Some(dest_entry) = destinations.get(&source_entry.path) {
                 // TODO: can we remove use of clone for optimization?
                 let mut result = dest_entry.clone();
-                result.action = Actions::SKIP;
+                result.action = Actions::Skip;
                 return result;
             } else {
                 let mut result = source_entry.clone();
-                result.action = Actions::CREATE;
+                result.action = Actions::Create;
                 return result;
             }
         })
         .collect();
 
     match strategy {
-        Strategy::MIRROR => {
+        Strategy::Mirror => {
             destinations
                 .values()
                 .cloned()
@@ -53,7 +53,7 @@ pub fn compare(source: &Path, destination: &Path, strategy: Strategy) -> Vec<Sta
                 .for_each(|destination_entry| {
                     if sources.get(&destination_entry.path).is_none() {
                         let mut item = destination_entry.clone();
-                        item.action = Actions::DELETE;
+                        item.action = Actions::Delete;
                         result.push(item);
                     }
                 });
@@ -68,13 +68,13 @@ fn get_states_map(dir_entries: WalkDir) -> HashMap<String, State> {
     let mut map: HashMap<String, State> = HashMap::new();
     dir_entries.into_iter().for_each(|entry| {
         let path = entry.expect("Error Reading entries").path().to_owned();
-        let mut path_type: PathType = PathType::UNKNOWN;
+        let mut path_type: PathType = PathType::Unknown;
         if path.is_dir() {
-            path_type = PathType::DIR;
+            path_type = PathType::Dir;
         } else if path.is_file() {
-            path_type = PathType::FILE;
+            path_type = PathType::File;
         } else if path.is_symlink() {
-            path_type = PathType::LINK;
+            path_type = PathType::Link;
         }
         let path_string = path.to_string_lossy().to_string();
         map.insert(
@@ -83,7 +83,7 @@ fn get_states_map(dir_entries: WalkDir) -> HashMap<String, State> {
                 hash: get_hash(path.as_path()),
                 path_type,
                 path: path_string,
-                action: Actions::SKIP,
+                action: Actions::Skip,
             },
         );
     });

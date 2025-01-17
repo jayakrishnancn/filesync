@@ -24,7 +24,7 @@ use sync_state::SyncState;
 fn main() {
     let args: Vec<String> = env::args().collect();
     let (source, destination, db_file_name) = validate::validate(args);
-    let strategy = Strategy::UPDATE;
+    let strategy = Strategy::Update;
     let items = compare::compare(source.as_path(), destination.as_path(), strategy);
     let items = filter::filter(items);
     let state = Arc::new(SyncState::new(&db_file_name));

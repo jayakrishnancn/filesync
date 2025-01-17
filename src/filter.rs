@@ -9,7 +9,7 @@ pub fn filter_ds_store(item: &State) -> bool {
 
 pub fn filter_skip_and_unknown_action(item: &State) -> bool {
     match item.action {
-        Actions::UNKNOWN | Actions::SKIP => false,
+        Actions::Unknown | Actions::Skip => false,
         _ => true,
     }
 }

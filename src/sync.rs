@@ -18,7 +18,7 @@ pub fn sync_files(source: &Path, destination: &Path, items: Vec<State>, state: &
             continue;
         }
         match item.action {
-            Actions::CREATE => {
+            Actions::Create => {
                 println!("copying {:?}", path);
                 fs::copy(path, to).expect("Can not copy the file/dir");
                 done_items.push(item.clone());
